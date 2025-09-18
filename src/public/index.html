@@ -1,0 +1,642 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Google Trends Scraper - Teknologi Niche</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            color: white;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .controls {
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+
+        .controls h3 {
+            margin-bottom: 20px;
+            color: #4a5568;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .form-group {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .form-control {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-control label {
+            margin-bottom: 5px;
+            font-weight: 600;
+            color: #4a5568;
+        }
+
+        .form-control select,
+        .form-control input {
+            padding: 10px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+
+        .form-control select:focus,
+        .form-control input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .checkbox-group {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .checkbox-item input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 25px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            justify-self: start;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 40px;
+            color: white;
+        }
+
+        .loading.show {
+            display: block;
+        }
+
+        .spinner {
+            border: 4px solid rgba(255,255,255,0.3);
+            border-radius: 50%;
+            border-top: 4px solid white;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .results {
+            display: none;
+        }
+
+        .results.show {
+            display: block;
+        }
+
+        .stats {
+            background: white;
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+        }
+
+        .stat-item {
+            text-align: center;
+            padding: 15px;
+            background: #f7fafc;
+            border-radius: 10px;
+        }
+
+        .stat-number {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            color: #718096;
+            margin-top: 5px;
+        }
+
+        .trends-grid {
+            display: grid;
+            gap: 20px;
+        }
+
+        .trend-card {
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .trend-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+        }
+
+        .trend-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 15px;
+        }
+
+        .trend-title {
+            font-size: 1.3rem;
+            font-weight: bold;
+            color: #2d3748;
+            flex: 1;
+        }
+
+        .trend-position {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: bold;
+        }
+
+        .trend-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .meta-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 0.9rem;
+            color: #718096;
+        }
+
+        .categories {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 15px;
+        }
+
+        .category-tag {
+            background: #e2e8f0;
+            color: #4a5568;
+            padding: 4px 12px;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+
+        .trend-description {
+            color: #4a5568;
+            line-height: 1.6;
+            margin-bottom: 15px;
+        }
+
+        .related-topics {
+            border-top: 1px solid #e2e8f0;
+            padding-top: 15px;
+        }
+
+        .related-topics h4 {
+            color: #4a5568;
+            margin-bottom: 10px;
+            font-size: 0.9rem;
+        }
+
+        .topics-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .topic-item {
+            background: #f0f4f8;
+            color: #2d3748;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+        }
+
+        .error {
+            background: #fed7d7;
+            color: #c53030;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            border-left: 4px solid #c53030;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 15px;
+            }
+
+            .header h1 {
+                font-size: 2rem;
+            }
+
+            .form-group {
+                grid-template-columns: 1fr;
+            }
+
+            .checkbox-group {
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            .trend-header {
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            .trend-meta {
+                flex-direction: column;
+                gap: 8px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1><i class="fas fa-chart-line"></i> Google Trends Scraper</h1>
+            <p>Temukan tren teknologi niche terbaru dengan anti-detection</p>
+        </div>
+
+        <div class="controls">
+            <h3><i class="fas fa-cog"></i> Pengaturan Scraping</h3>
+            
+            <div class="form-group">
+                <div class="form-control">
+                    <label for="region">Region:</label>
+                    <select id="region">
+                        <option value="US">United States</option>
+                        <option value="ID">Indonesia</option>
+                        <option value="GB">United Kingdom</option>
+                        <option value="JP">Japan</option>
+                        <option value="DE">Germany</option>
+                        <option value="FR">France</option>
+                        <option value="CA">Canada</option>
+                        <option value="AU">Australia</option>
+                    </select>
+                </div>
+                
+                <div class="form-control">
+                    <label for="limit">Jumlah Hasil:</label>
+                    <input type="number" id="limit" value="15" min="5" max="50">
+                </div>
+            </div>
+
+            <div class="form-control">
+                <label>Sumber Data:</label>
+                <div class="checkbox-group">
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="realtime" checked>
+                        <label for="realtime">Real-time Trends</label>
+                    </div>
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="daily" checked>
+                        <label for="daily">Daily Trends</label>
+                    </div>
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="analysis">
+                        <label for="analysis">Analisis Keyword Detail</label>
+                    </div>
+                </div>
+            </div>
+
+            <div style="display: flex; gap: 15px; flex-wrap: wrap;">
+                <button class="btn" onclick="fetchTrends()">
+                    <i class="fas fa-search"></i>
+                    Mulai Scraping
+                </button>
+                
+                <button class="btn" onclick="saveTrends()" style="background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);">
+                    <i class="fas fa-save"></i>
+                    Simpan ke JSON
+                </button>
+            </div>
+        </div>
+
+        <div class="loading" id="loading">
+            <div class="spinner"></div>
+            <h3>Sedang mengambil data trends...</h3>
+            <p>Mohon tunggu, proses ini memerlukan waktu untuk menghindari deteksi bot</p>
+        </div>
+
+        <div class="results" id="results">
+            <div class="stats" id="stats"></div>
+            <div class="trends-grid" id="trendsGrid"></div>
+        </div>
+
+        <div class="error" id="error" style="display: none;"></div>
+    </div>
+
+    <script>
+        async function fetchTrends() {
+            const loadingEl = document.getElementById('loading');
+            const resultsEl = document.getElementById('results');
+            const errorEl = document.getElementById('error');
+            const btn = document.querySelector('.btn');
+            
+            // Show loading
+            loadingEl.classList.add('show');
+            resultsEl.classList.remove('show');
+            errorEl.style.display = 'none';
+            btn.disabled = true;
+            
+            try {
+                const params = new URLSearchParams({
+                    geo: document.getElementById('region').value,
+                    limit: document.getElementById('limit').value,
+                    includeRealtime: document.getElementById('realtime').checked,
+                    includeDaily: document.getElementById('daily').checked,
+                    includeKeywordAnalysis: document.getElementById('analysis').checked
+                });
+                
+                const response = await fetch(`/api/trends?${params}`);
+                const data = await response.json();
+                
+                if (data.success) {
+                    displayResults(data);
+                } else {
+                    throw new Error(data.error || 'Unknown error occurred');
+                }
+                
+            } catch (error) {
+                console.error('Error:', error);
+                errorEl.textContent = `Error: ${error.message}`;
+                errorEl.style.display = 'block';
+            } finally {
+                loadingEl.classList.remove('show');
+                btn.disabled = false;
+            }
+        }
+        
+        async function saveTrends() {
+            const btn = event.target;
+            const loadingEl = document.getElementById('loading');
+            const errorEl = document.getElementById('error');
+            
+            // Get form values
+            const geo = document.getElementById('geo').value;
+            const limit = document.getElementById('limit').value;
+            const techOnly = document.getElementById('techOnly').checked;
+            const includeRealtime = document.getElementById('realtime').checked;
+            const includeDaily = document.getElementById('daily').checked;
+            const includeTrendingOverview = document.getElementById('overview').checked;
+            const includeKeywordAnalysis = document.getElementById('analysis').checked;
+            const includeNewsLinks = document.getElementById('newsLinks').checked;
+            
+            btn.disabled = true;
+            loadingEl.classList.add('show');
+            errorEl.style.display = 'none';
+            
+            // Update loading message for save
+            loadingEl.innerHTML = `
+                <div class="spinner"></div>
+                <h3>Menyimpan data trends ke file JSON...</h3>
+                <p>Mohon tunggu, sedang memproses dan menyimpan data</p>
+            `;
+            
+            try {
+                const response = await fetch('/api/save-trends', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        geo,
+                        limit,
+                        techOnly: techOnly.toString(),
+                        includeRealtime: includeRealtime.toString(),
+                        includeDaily: includeDaily.toString(),
+                        includeTrendingOverview: includeTrendingOverview.toString(),
+                        includeKeywordAnalysis: includeKeywordAnalysis.toString(),
+                        includeNewsLinks: includeNewsLinks.toString()
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    // Show success message
+                    const successMessage = document.createElement('div');
+                    successMessage.style.cssText = `
+                        position: fixed;
+                        top: 20px;
+                        right: 20px;
+                        background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+                        color: white;
+                        padding: 15px 20px;
+                        border-radius: 10px;
+                        box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+                        z-index: 1000;
+                        max-width: 400px;
+                    `;
+                    successMessage.innerHTML = `
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            <i class="fas fa-check-circle"></i>
+                            <div>
+                                <strong>Data berhasil disimpan!</strong><br>
+                                <small>File: ${data.filename}</small><br>
+                                <small>Total data: ${data.dataCount} trends</small>
+                            </div>
+                        </div>
+                    `;
+                    
+                    document.body.appendChild(successMessage);
+                    
+                    // Remove success message after 5 seconds
+                    setTimeout(() => {
+                        successMessage.remove();
+                    }, 5000);
+                    
+                } else {
+                    throw new Error(data.error || 'Unknown error occurred');
+                }
+                
+            } catch (error) {
+                console.error('Save Error:', error);
+                errorEl.textContent = `Error saving: ${error.message}`;
+                errorEl.style.display = 'block';
+            } finally {
+                loadingEl.classList.remove('show');
+                btn.disabled = false;
+                
+                // Reset loading message
+                loadingEl.innerHTML = `
+                    <div class="spinner"></div>
+                    <h3>Sedang mengambil data trends...</h3>
+                    <p>Mohon tunggu, proses ini memerlukan waktu untuk menghindari deteksi bot</p>
+                `;
+            }
+        }
+        
+        function displayResults(data) {
+            const resultsEl = document.getElementById('results');
+            const statsEl = document.getElementById('stats');
+            const trendsGridEl = document.getElementById('trendsGrid');
+            
+            // Display stats
+            statsEl.innerHTML = `
+                <h3><i class="fas fa-chart-bar"></i> Statistik Scraping</h3>
+                <div class="stats-grid">
+                    <div class="stat-item">
+                        <div class="stat-number">${data.metadata.totalTrends}</div>
+                        <div class="stat-label">Total Trends</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number">${data.metadata.techTrends}</div>
+                        <div class="stat-label">Tech Trends</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number">${data.metadata.topTrends}</div>
+                        <div class="stat-label">Top Niche</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number">${data.metadata.geo}</div>
+                        <div class="stat-label">Region</div>
+                    </div>
+                </div>
+            `;
+            
+            // Display trends
+            trendsGridEl.innerHTML = data.data.map((trend, index) => `
+                <div class="trend-card">
+                    <div class="trend-header">
+                        <div class="trend-title">${trend.title}</div>
+                        <div class="trend-position">#${trend.position}</div>
+                    </div>
+                    
+                    <div class="trend-meta">
+                        <div class="meta-item">
+                            <i class="fas fa-chart-line"></i>
+                            ${trend.traffic || 'N/A'}
+                        </div>
+                        <div class="meta-item">
+                            <i class="fas fa-star"></i>
+                            Skor: ${trend.relevanceScore}
+                        </div>
+                        <div class="meta-item">
+                            <i class="fas fa-globe"></i>
+                            ${trend.source}
+                        </div>
+                    </div>
+                    
+                    <div class="categories">
+                        ${trend.categories.map(cat => `<span class="category-tag">${cat}</span>`).join('')}
+                    </div>
+                    
+                    ${trend.description ? `<div class="trend-description">${trend.description}</div>` : ''}
+                    
+                    ${trend.relatedTopics && trend.relatedTopics.length > 0 ? `
+                        <div class="related-topics">
+                            <h4><i class="fas fa-tags"></i> Topik Terkait:</h4>
+                            <div class="topics-list">
+                                ${trend.relatedTopics.slice(0, 5).map(topic => `<span class="topic-item">${topic}</span>`).join('')}
+                            </div>
+                        </div>
+                    ` : ''}
+                </div>
+            `).join('');
+            
+            resultsEl.classList.add('show');
+        }
+        
+        // Auto-fetch on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            // Optional: Auto-fetch trends on page load
+            // fetchTrends();
+        });
+    </script>
+</body>
+</html>
