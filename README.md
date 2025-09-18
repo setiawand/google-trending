@@ -103,6 +103,18 @@ Mengambil semua trending topics
 - `includeTrendingOverview` - Include trending overview (default: false)
 - `includeNewsLinks` - Include news links (default: false)
 
+**Contoh Curl:**
+```bash
+# Basic request
+curl "http://localhost:3000/api/trends"
+
+# Dengan parameter
+curl "http://localhost:3000/api/trends?geo=US&limit=10&includeNewsLinks=true"
+
+# Untuk region Indonesia
+curl "http://localhost:3000/api/trends?geo=ID&limit=20"
+```
+
 **Response:**
 ```json
 {
@@ -142,14 +154,81 @@ Analisis mendalam untuk keyword tertentu
 - `geo` - Region code (default: US)
 - `timeRange` - Time range (default: today 12-m)
 
+**Contoh Curl:**
+```bash
+# Analisis keyword "artificial intelligence"
+curl "http://localhost:3000/api/keyword/artificial%20intelligence"
+
+# Dengan parameter geo dan timeRange
+curl "http://localhost:3000/api/keyword/blockchain?geo=US&timeRange=today%2012-m"
+
+# Untuk region Indonesia
+curl "http://localhost:3000/api/keyword/teknologi?geo=ID"
+```
+
+### POST `/api/save-trends`
+Menyimpan trending topics ke file JSON
+
+**Body Parameters:**
+- `geo` - Region code (default: US)
+- `limit` - Jumlah hasil (default: 25)
+- `techOnly` - Hanya teknologi (default: false)
+- `includeRealtime` - Include realtime trends (default: true)
+- `includeDaily` - Include daily trends (default: true)
+- `includeTrendingOverview` - Include trending overview (default: true)
+- `includeNewsLinks` - Include news links (default: false)
+- `filename` - Nama file (opsional)
+
+**Contoh Curl:**
+```bash
+# Basic save
+curl -X POST "http://localhost:3000/api/save-trends" \
+  -H "Content-Type: application/json" \
+  -d '{}'
+
+# Dengan parameter lengkap
+curl -X POST "http://localhost:3000/api/save-trends" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "geo": "US",
+    "limit": 50,
+    "includeNewsLinks": true,
+    "filename": "trends-today.json"
+  }'
+
+# Simpan untuk Indonesia dengan berita
+curl -X POST "http://localhost:3000/api/save-trends" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "geo": "ID",
+    "limit": 30,
+    "includeNewsLinks": true
+  }'
+```
+
 ### GET `/api/stats`
 Statistik scraper
+
+**Contoh Curl:**
+```bash
+curl "http://localhost:3000/api/stats"
+```
 
 ### GET `/api/categories`
 Daftar kategori yang tersedia
 
+**Contoh Curl:**
+```bash
+curl "http://localhost:3000/api/categories"
+```
+
 ### GET `/health`
 Health check endpoint
+
+**Contoh Curl:**
+```bash
+curl "http://localhost:3000/health"
+```
 
 ## 🌍 Sumber Data Trending
 
