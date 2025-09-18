@@ -1,21 +1,22 @@
-# Google Trends Scraper - Teknologi Niche
+# Google Trends Scraper - All Trending Topics
 
-🚀 **Aplikasi web scraping Google Trends yang fokus pada kategori teknologi niche dengan anti-detection menggunakan Playwright**
+🚀 **Aplikasi web scraping Google Trends yang mengambil semua trending topics dengan anti-detection menggunakan Puppeteer**
 
 ## ✨ Fitur Utama
 
-- 🤖 **Anti-Detection**: Menggunakan stealth mode dengan Playwright untuk menghindari deteksi bot
-- 🎯 **Fokus Teknologi Niche**: Filter otomatis untuk tren teknologi yang sedang berkembang
+- 🤖 **Anti-Detection**: Menggunakan stealth mode dengan Puppeteer untuk menghindari deteksi bot
+- 🌍 **All Trending Topics**: Mengambil semua trending topics dari berbagai kategori
 - ⚡ **Rate Limiting**: Sistem delay cerdas untuk menghindari pemblokiran
 - 🌐 **Web Interface**: Dashboard modern dan responsif
-- 📊 **Multiple Sources**: Mengambil data dari real-time dan daily trends
+- 📊 **Multiple Sources**: Mengambil data dari realtime trends, daily trends, dan trending overview
 - 🔍 **Keyword Analysis**: Analisis mendalam untuk keyword tertentu
-- 📈 **Scoring System**: Sistem penilaian relevansi untuk tren niche
+- 🧹 **Text Cleaning**: Pembersihan otomatis untuk kualitas data yang lebih baik
+- 📝 **Console Logging**: Display trending topics di console untuk monitoring
 
 ## 🛠️ Teknologi yang Digunakan
 
 - **Node.js** - Runtime JavaScript
-- **Playwright** - Browser automation dengan stealth mode
+- **Puppeteer** - Browser automation dengan stealth mode
 - **Express.js** - Web server dan API
 - **HTML/CSS/JavaScript** - Frontend interface
 - **dotenv** - Environment configuration
@@ -29,9 +30,9 @@
    npm install
    ```
 
-3. **Install Playwright browsers:**
+3. **Install Puppeteer browsers:**
    ```bash
-   npm run install-browsers
+   npx puppeteer browsers install chrome
    ```
 
 4. **Konfigurasi environment (opsional):**
@@ -57,10 +58,10 @@ npm start -- --overview
 ### Mode Web Server
 ```bash
 # Jalankan web server
-npm run server
+PORT=3001 node src/server.js
 ```
 
-Kemudian buka browser dan akses: `http://localhost:3000`
+Kemudian buka browser dan akses: `http://localhost:3001`
 
 ## 🔧 Konfigurasi
 
@@ -68,7 +69,7 @@ Edit file `.env` untuk menyesuaikan pengaturan:
 
 ```env
 # Server Configuration
-PORT=3000
+PORT=3001
 
 # Scraping Configuration
 SCRAPE_DELAY_MIN=2000
@@ -76,7 +77,6 @@ SCRAPE_DELAY_MAX=5000
 MAX_CONCURRENT_REQUESTS=2
 
 # Google Trends Configuration
-TREND_CATEGORIES=technology,programming,ai,blockchain,cybersecurity,cloud,iot,machine-learning
 REGION=US
 TIME_RANGE=today 12-m
 HL=en-US
@@ -93,14 +93,15 @@ DEBUG_MODE=false
 ## 📊 API Endpoints
 
 ### GET `/api/trends`
-Mengambil tren teknologi niche
+Mengambil semua trending topics
 
 **Query Parameters:**
 - `geo` - Region code (default: US)
 - `limit` - Jumlah hasil (default: 15)
-- `includeRealtime` - Include real-time trends (default: true)
+- `includeRealtime` - Include realtime trends (default: true)
 - `includeDaily` - Include daily trends (default: true)
-- `includeKeywordAnalysis` - Include detailed analysis (default: false)
+- `includeTrendingOverview` - Include trending overview (default: false)
+- `includeNewsLinks` - Include news links (default: false)
 
 **Response:**
 ```json
@@ -108,22 +109,29 @@ Mengambil tren teknologi niche
   "success": true,
   "data": [
     {
-      "title": "React 18",
-      "traffic": "50K+ searches",
-      "categories": ["programming", "niche"],
-      "relevanceScore": 15,
-      "position": 1,
-      "source": "realtime",
-      "relatedTopics": ["Next.js", "TypeScript"]
+      "title": "jimmy kimmel fired",
+      "volume": "500K+",
+      "timeAgo": "1h ago",
+      "source": "selector_1",
+      "elementIndex": 1
     }
   ],
   "metadata": {
     "totalTrends": 25,
-    "techTrends": 12,
-    "topTrends": 10,
+    "uniqueTrends": 25,
+    "returnedTrends": 5,
     "geo": "US",
-    "timestamp": "2024-01-15T10:30:00.000Z"
-  }
+    "timestamp": "2025-09-18T00:01:08.418Z",
+    "stats": {
+      "totalRequests": 1,
+      "activeRequests": 0,
+      "maxConcurrent": 2,
+      "lastRequestTime": "2025-09-18T00:01:03.593Z"
+    },
+    "includeNewsLinks": false,
+    "newsLinksCount": 0
+  },
+  "timestamp": "2025-09-18T00:01:08.418Z"
 }
 ```
 
@@ -143,40 +151,24 @@ Daftar kategori yang tersedia
 ### GET `/health`
 Health check endpoint
 
-## 🎯 Kategori Teknologi Niche
+## 🌍 Sumber Data Trending
 
-Aplikasi ini secara otomatis memfilter dan mengkategorikan tren berdasarkan:
+Aplikasi ini mengambil data dari berbagai sumber Google Trends:
 
-### Programming & Development
-- JavaScript, Python, React, Node.js, TypeScript
-- Docker, Kubernetes, Microservices, API, GraphQL
-- Git, GitHub, DevOps, CI/CD
+### Realtime Trends
+- Data trending yang sedang populer saat ini
+- Update secara real-time
+- Menggunakan trending overview sebagai sumber utama
 
-### AI & Machine Learning
-- Artificial Intelligence, Machine Learning, Deep Learning
-- TensorFlow, PyTorch, OpenAI, ChatGPT, LLM
-- Computer Vision, NLP, Transformer models
+### Daily Trends  
+- Trending topics harian
+- Data yang sudah diverifikasi dan difilter
+- Mencakup berbagai kategori topik
 
-### Blockchain & Crypto
-- Blockchain, Cryptocurrency, Bitcoin, Ethereum
-- NFT, DeFi, Smart Contracts, Web3, DAO
-
-### Cloud & Infrastructure
-- AWS, Azure, Google Cloud, Serverless
-- Cloud Computing, SaaS, PaaS, Edge Computing
-
-### Cybersecurity
-- Cybersecurity, InfoSec, Penetration Testing
-- Vulnerability, Malware, Encryption, VPN
-
-### IoT & Hardware
-- Internet of Things, Raspberry Pi, Arduino
-- Embedded Systems, Smart Home, Wearables
-
-### Emerging Technologies
-- Quantum Computing, AR/VR, 5G/6G
-- Edge AI, Neuromorphic Computing
-
+### Trending Overview
+- Overview lengkap dari semua trending topics
+- Data yang sudah dibersihkan dan dioptimalkan
+- Sumber utama untuk realtime trends
 ## 🛡️ Anti-Detection Features
 
 1. **Stealth Mode**: Menggunakan konfigurasi browser yang menyerupai pengguna asli
@@ -185,6 +177,7 @@ Aplikasi ini secara otomatis memfilter dan mengkategorikan tren berdasarkan:
 4. **Rate Limiting**: Pembatasan request untuk menghindari spam detection
 5. **Resource Blocking**: Memblokir resource yang tidak perlu untuk mempercepat loading
 6. **Headers Manipulation**: Mengatur headers HTTP yang realistis
+7. **Text Cleaning**: Pembersihan otomatis untuk menghilangkan noise dari data
 
 ## 📁 Struktur Proyek
 
@@ -210,45 +203,50 @@ google-trending/
 ## 🔍 Contoh Output
 
 ```
-📊 HASIL SCRAPING GOOGLE TRENDS - TEKNOLOGI NICHE
-============================================================
+📊 DAFTAR TRENDING TOPICS:
+==================================================
+1. jimmy kimmel fired
+   📈 Volume: 500K+
+   ⏰ Time: 1h ago
+   📍 Source: selector_1
 
-1. Svelte 5
-   📈 Traffic: 25K+ searches
-   🏷️  Kategori: programming, niche
-   ⭐ Skor Relevansi: 15
-   📍 Sumber: realtime
-   🔗 Topik Terkait: SvelteKit, Vite, React
+2. kimmel
+   📈 Volume: 500K+
+   ⏰ Time: 1h ago
+   📍 Source: selector_1
 
-2. Rust Programming
-   📈 Traffic: 18K+ searches
-   🏷️  Kategori: programming, niche
-   ⭐ Skor Relevansi: 13
-   📍 Sumber: daily
-   🔗 Topik Terkait: WebAssembly, Systems Programming
+3. what did jimmy kimmel do
+   📈 Volume: 500K+
+   ⏰ Time: 1h ago
+   📍 Source: selector_1
+
+✅ Total: 8 trending topics untuk region US
+==================================================
 
 📈 STATISTIK SCRAPING
 ==============================
-Total trends ditemukan: 28
-Trends teknologi: 15
-Top trends niche: 12
+Total trends ditemukan: 25
+Unique trends: 25
+Returned trends: 8
 Region: US
-Waktu scraping: 15/01/2024 17:30:00
+Waktu scraping: 18/09/2025 00:01:08
 
-Total requests: 3
+Total requests: 2
 Active requests: 0
-Kategori tersedia: programming, ai, blockchain, cloud, cybersecurity, iot, emerging, data, niche
+Max concurrent: 2
 ```
 
 ## ⚠️ Penting untuk Diperhatikan
 
 1. **Rate Limiting**: Aplikasi menggunakan delay otomatis untuk menghindari deteksi. Proses scraping memerlukan waktu.
 
-2. **Resource Usage**: Playwright memerlukan resource yang cukup besar. Pastikan sistem memiliki RAM yang cukup.
+2. **Resource Usage**: Puppeteer memerlukan resource yang cukup besar. Pastikan sistem memiliki RAM yang cukup.
 
 3. **Legal Compliance**: Pastikan penggunaan scraper sesuai dengan Terms of Service Google Trends.
 
 4. **Network**: Koneksi internet yang stabil diperlukan untuk hasil optimal.
+
+5. **Text Cleaning**: Data trending akan dibersihkan secara otomatis untuk menghilangkan noise dan duplikasi.
 
 ## 🤝 Kontribusi
 
@@ -267,7 +265,7 @@ MIT License - Lihat file LICENSE untuk detail lengkap.
 
 ### Error: Browser tidak ditemukan
 ```bash
-npm run install-browsers
+npx puppeteer browsers install chrome
 ```
 
 ### Error: Permission denied
