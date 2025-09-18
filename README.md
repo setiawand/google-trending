@@ -1,10 +1,10 @@
 # Google Trends Scraper - All Trending Topics
 
-🚀 **Aplikasi web scraping Google Trends yang mengambil semua trending topics dengan anti-detection menggunakan Puppeteer**
+🚀 **Aplikasi web scraping Google Trends yang mengambil semua trending topics dengan anti-detection menggunakan Playwright**
 
 ## ✨ Fitur Utama
 
-- 🤖 **Anti-Detection**: Menggunakan stealth mode dengan Puppeteer untuk menghindari deteksi bot
+- 🤖 **Anti-Detection**: Menggunakan stealth mode dengan Playwright untuk menghindari deteksi bot
 - 🌍 **All Trending Topics**: Mengambil semua trending topics dari berbagai kategori
 - ⚡ **Rate Limiting**: Sistem delay cerdas untuk menghindari pemblokiran
 - 🌐 **Web Interface**: Dashboard modern dan responsif
@@ -16,7 +16,7 @@
 ## 🛠️ Teknologi yang Digunakan
 
 - **Node.js** - Runtime JavaScript
-- **Puppeteer** - Browser automation dengan stealth mode
+- **Playwright** - Browser automation dengan stealth mode
 - **Express.js** - Web server dan API
 - **HTML/CSS/JavaScript** - Frontend interface
 - **dotenv** - Environment configuration
@@ -30,9 +30,9 @@
    npm install
    ```
 
-3. **Install Puppeteer browsers:**
+3. **Install Playwright browsers:**
    ```bash
-   npx puppeteer browsers install chrome
+   npx playwright install
    ```
 
 4. **Konfigurasi environment (opsional):**
@@ -58,10 +58,10 @@ npm start -- --overview
 ### Mode Web Server
 ```bash
 # Jalankan web server
-PORT=3001 node src/server.js
+npm run server
 ```
 
-Kemudian buka browser dan akses: `http://localhost:3001`
+Kemudian buka browser dan akses: `http://localhost:3000`
 
 ## 🔧 Konfigurasi
 
@@ -69,7 +69,7 @@ Edit file `.env` untuk menyesuaikan pengaturan:
 
 ```env
 # Server Configuration
-PORT=3001
+PORT=3000
 
 # Scraping Configuration
 SCRAPE_DELAY_MIN=2000
@@ -240,7 +240,7 @@ Max concurrent: 2
 
 1. **Rate Limiting**: Aplikasi menggunakan delay otomatis untuk menghindari deteksi. Proses scraping memerlukan waktu.
 
-2. **Resource Usage**: Puppeteer memerlukan resource yang cukup besar. Pastikan sistem memiliki RAM yang cukup.
+2. **Resource Usage**: Playwright memerlukan resource yang cukup besar. Pastikan sistem memiliki RAM yang cukup.
 
 3. **Legal Compliance**: Pastikan penggunaan scraper sesuai dengan Terms of Service Google Trends.
 
@@ -265,7 +265,7 @@ MIT License - Lihat file LICENSE untuk detail lengkap.
 
 ### Error: Browser tidak ditemukan
 ```bash
-npx puppeteer browsers install chrome
+npx playwright install
 ```
 
 ### Error: Permission denied
